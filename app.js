@@ -172,6 +172,21 @@ document.getElementById("search-input").addEventListener("input", function() {
 });
 
 
+function exportAsImage() {
+    const svgElement = document.querySelector("#karma-tree-container svg");
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+    const url = URL.createObjectURL(svgBlob);
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = "karma_tree.svg";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+
+document.getElementById("export-button").addEventListener("click", exportAsImage);
 
 function calculateKarma(node) {
     let karmaScore = 0;
@@ -190,21 +205,10 @@ function updateKarmaScores() {
     document.getElementById("total-karma").textContent = `Total Karma: ${totalKarma}`;
 }
 
+// Add event listener for updating karma scores
+window.addEventListener('resize', updateKarmaScores);
+window.addEventListener('load', updateKarmaScores);
+
 updateKarmaScores();
 
-function exportAsImage() {
-    const svgElement = document.querySelector("#karma-tree-container svg");
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
-    const url = URL.createObjectURL(svgBlob);
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "karma_tree.svg";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-}
-
-
-document.getElementById("export-button").addEventListener("click", exportAsImage);
   

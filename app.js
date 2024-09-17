@@ -6,6 +6,7 @@ document.getElementById('karmaForm').addEventListener('submit', function(event) 
     const subject = document.getElementById('subject').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
+    
 
     // Validate inputs
     if (!subject || !startDate || !endDate) {
@@ -184,3 +185,43 @@ document.getElementById('exportButton').addEventListener('click', function() {
 
     image.src = url;
 });
+
+const zoomHandler = d3.zoom()
+    .on("zoom", () => {
+        svg.attr("transform", d3.event.transform);
+    });
+svg.call(zoomHandler);
+
+node.on("click", function(event, d) {
+    // Logic to expand or reveal further node details
+    alert(`Details for: ${d.id}`);
+});
+
+
+const tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+node.on("mouseover", function(event, d) {
+    tooltip.transition().duration(200).style("opacity", .9);
+    tooltip.html(`Details for ${d.id}`)
+        .style("left", (event.pageX + 5) + "px")
+        .style("top", (event.pageY - 28) + "px");
+})
+.on("mouseout", function(d) {
+    tooltip.transition().duration(500).style("opacity", 0);
+});
+
+
+node.attr("fill", d => {
+    if (d.type === "input") return "green"; // Positive
+    if (d.type === "output") return "blue"; // Neutral
+    if (d.type === "intersection") return "orange"; // Karmic Crossroads
+});
+
+function updateKarmaTree() {
+    const timeValue = document.getElementById("timeSlider").value;
+    // Update tree rendering based on time progression
+    // E.g., Show past events, and future forecasts dynamically
+}
+

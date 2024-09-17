@@ -2,10 +2,12 @@
 
 document.getElementById('karmaForm').addEventListener('submit', function(event) {
     event.preventDefault();
-
+    
     const subject = document.getElementById('subject').value;
+    const eventType = document.getElementById('eventType').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
+    const otherInfluences = document.getElementById('otherInfluences').value;
     
 
     // Validate inputs
@@ -15,7 +17,7 @@ document.getElementById('karmaForm').addEventListener('submit', function(event) 
     }
 
     // Generate Karma Tree using D3.js
-    generateKarmaTree(subject, startDate, endDate);
+    generateKarmaTree(subject, eventType, otherInfluences, startDate, endDate);
 });
 
 // function generateKarmaTree(subject, startDate, endDate) {
@@ -116,12 +118,7 @@ document.getElementById('karmaForm').addEventListener('submit', function(event) 
 //     }
 // }
 
-function generateKarmaTree() {
-    const subject = document.getElementById('subject').value;
-    const eventType = document.getElementById('eventType').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const otherInfluences = document.getElementById('otherInfluences').value;
+function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDate) {
 
     // Validate inputs
     if (!subject || !eventType || !startDate || !endDate) {

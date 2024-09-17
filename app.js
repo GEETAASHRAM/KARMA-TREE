@@ -1,214 +1,161 @@
-// app.js
+// script.js
 
-const width = window.innerWidth * 0.95,
-    height = window.innerHeight * 0.85;
+document.getElementById('karmaForm').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-const svg = d3.select("#karma-tree-container")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    const subject = document.getElementById('subject').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
 
-const treeData = [
-    {
-        name: "Cosmic Context",
-        children: [
-            {name: "Galactic Influences"},
-            {name: "Solar System Dynamics"},
-            {name: "Planetary Alignments"}
-        ]
-    },
-    {
-        name: "Environmental Layer",
-        children: [
-            {name: "Ecosystem Interactions"},
-            {name: "Climate Patterns"},
-            {name: "Geographical Influences"}
-        ]
-    },
-    // Add more layers here...
-];
+    // Validate inputs
+    if (!subject || !startDate || !endDate) {
+        alert("Please fill out all fields.");
+        return;
+    }
 
-function drawTree(data) {
-    const treeLayout = d3.tree().size([height, width]);
-    const nodes = treeLayout(d3.hierarchy(data));
-    const links = nodes.descendants().slice(1);
-
-    const link = svg.append("g").selectAll(".link")
-        .data(links)
-        .enter().append("path")
-        .attr("class", "link")
-        .attr("d", d3.linkHorizontal()
-            .x(d => d.y)
-            .y(d => d.x));
-
-    const nodeEnter = svg.selectAll(".node")
-        .data(nodes)
-        .enter().append("g")
-        .attr("class", "node")
-        .attr("transform", d => `translate(${d.y}, ${d.x})`);
-
-    nodeEnter.append("circle");
-
-    nodeEnter.append("text")
-        .attr("dy", ".35em")
-        .attr("x", d => d.children ? -13 : 13)
-        .style("text-anchor", d => d.children ? "end" : "start");
-
-    nodeEnter.append("title").text(d => d.data.name);
-
-    nodeEnter.select("circle")
-        .on("click", function() {
-            d3.select(this).transition()
-                .duration(750)
-                .attr("r", d => d._children ? 15 : 5);
-        });
-
-    nodeEnter.select(".karma-score")
-        .text(d => Math.random().toString(36).substring(7))
-        .attr("y", d => d.children ? -5 : 5);
-}
-
-drawTree(treeData);
-
-// Add drag functionality
-function dragStarted(event, d) {
-    event.sourceEvent.dataTransfer.effectAllowed = "move";
-    event.sourceEvent.dataTransfer.dropEffect = "move";
-    event.sourceEvent.dataTransfer.setData("text/plain", d.id);
-    d3.event.preventDefault();
-}
-
-function dragged(event, d) {
-    event.sourceEvent.dataTransfer.dropEffect = "move";
-}
-
-function droped(event, d) {
-    const dragNode = d3.select(draggedNodesKnot);
-    const dropNode = d3.select(d3.event.target);
-    const overlap = dropNode.node().getBBox().width / 2;
-    const dx = (dropNode.attr("x") - dragNode.attr("x")) * (dragNode.attr("r") / overlap);
-    const dy = (dropNode.attr("y") - dragNode.attr("y")) * (dragNode.attr("r") / overlap);
-    dragNode.attr("transform", `translate(${dx},${dy})`);
-}
-
-svg.on("mousedown", function() {
-    const draggedNodesKnot = svg.selectAll(".node");
-    const mousedown = d3.mouse(this);
-    const drag = d3.drag()
-        .on("start", dragStarted)
-        .on("drag", dragged)
-        .on("end", droped);
-    draggedNodesKnot.call(drag);
+    // Generate Karma Tree using D3.js
+    generateKarmaTree(subject, startDate, endDate);
 });
 
-// Add hover effects
-svg.selectAll(".node")
-    .on("mouseover", function(event, d) {
-        d3.select(this).select("circle").transition()
-            .duration(200)
-            .attr("r", 15);
-    })
-    .on("mouseout", function(event, d) {
-        d3.select(this).select("circle").transition()
-            .duration(200)
-            .attr("r", 5);
+function generateKarmaTree(subject, startDate, endDate) {
+    // Clear any existing SVG elements
+    d3.select("#karmaTreeSvg").selectAll("*").remove();
+
+    const svg = d3.select("#karmaTreeSvg");
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
+
+    // Sample data for Karma Tree (can be dynamically generated based on input)
+    const data = {
+        nodes: [
+            { id: subject, type: 'subject' },
+            { id: 'Action 1', type: 'positive' },
+            { id: 'Action 2', type: 'negative' },
+            { id: 'Action 3', type: 'positive' },
+            { id: 'Outcome 1', type: 'positive' },
+            { id: 'Outcome 2', type: 'negative' }
+        ],
+        links: [
+            { source: subject, target: 'Action 1' },
+            { source: subject, target: 'Action 2' },
+            { source: subject, target: 'Action 3' },
+            { source: 'Action 1', target: 'Outcome 1' },
+            { source: 'Action 2', target: 'Outcome 2' }
+        ]
+    };
+
+    const simulation = d3.forceSimulation(data.nodes)
+        .force("link", d3.forceLink(data.links).id(d => d.id).distance(150))
+        .force("charge", d3.forceManyBody().strength(-300))
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+    const link = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(data.links)
+        .enter().append("line")
+        .attr("stroke-width", 2)
+        .attr("stroke", "#999");
+
+    const node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(data.nodes)
+        .enter().append("circle")
+        .attr("r", 10)
+        .attr("fill", d => d.type === 'positive' ? '#4caf50' : '#f44336')
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+
+    node.append("title")
+        .text(d => d.id);
+
+    const label = svg.append("g")
+        .attr("class", "labels")
+        .selectAll("text")
+        .data(data.nodes)
+        .enter().append("text")
+        .attr("dy", -12)
+        .attr("text-anchor", "middle")
+        .text(d => d.id);
+
+    simulation.on("tick", () => {
+        link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+
+        node
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y);
+
+        label
+            .attr("x", d => d.x)
+            .attr("y", d => d.y);
     });
 
-// Add filtering functionality
-function filterTree(filterTerm) {
-    const filteredData = treeData.filter(node => 
-        node.name.toLowerCase().includes(filterTerm.toLowerCase()) ||
-        node.children && node.children.some(child => child.name.toLowerCase().includes(filterTerm.toLowerCase()))
-    );
-
-    drawTree(filteredData);
-}
-
-
-// Add searching functionality
-function searchTree(searchTerm) {
-    const searchedData = treeData.reduce((acc, node) => {
-        if (node.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-            acc.push(node);
-        }
-        if (node.children) {
-            acc = acc.concat(searchNodeChildren(node.children, searchTerm));
-        }
-        return acc;
-    }, []);
-
-    drawTree(searchedData);
-}
-
-function searchNodeChildren(children, searchTerm) {
-    return children.reduce((acc, child) => {
-        if (child.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-            acc.push(child);
-        }
-        if (child.children) {
-            acc = acc.concat(searchNodeChildren(child.children, searchTerm));
-        }
-        return acc;
-    }, []);
-}
-
-// Add event listeners for filtering and searching
-document.getElementById("filter-input").addEventListener("input", function() {
-    const filterTerm = this.value.trim();
-    if (filterTerm.length > 0) {
-        filterTree(filterTerm);
-    } else {
-        drawTree(treeData);
+    function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
     }
+
+    function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+}
+
+// Search functionality
+document.getElementById('search').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    d3.selectAll('circle').style('stroke', function(d) {
+        return d.id.toLowerCase().includes(searchTerm) ? '#ffeb3b' : null;
+    });
 });
 
-document.getElementById("search-input").addEventListener("input", function() {
-    const searchTerm = this.value.trim();
-    if (searchTerm.length > 0) {
-        searchTree(searchTerm);
-    } else {
-        drawTree(treeData);
-    }
+// Filter functionality
+document.getElementById('filter').addEventListener('change', function() {
+    const filterValue = this.value;
+    d3.selectAll('circle').style('opacity', function(d) {
+        if (filterValue === 'all') return 1;
+        return d.type === filterValue ? 1 : 0.1;
+    });
 });
 
+// Export functionality
+document.getElementById('exportButton').addEventListener('click', function() {
+    const svgElement = document.querySelector("#karmaTreeSvg");
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svgElement);
 
-function exportAsImage() {
-    const svgElement = document.querySelector("#karma-tree-container svg");
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+    const image = new Image();
+    const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(svgBlob);
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "karma_tree.svg";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-}
 
+    image.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = svgElement.getBoundingClientRect().width;
+        canvas.height = svgElement.getBoundingClientRect().height;
+        const context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0);
+        URL.revokeObjectURL(url);
 
-// document.getElementById("export-button").addEventListener("click", exportAsImage);
+        // Download as PNG
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'karma_tree.png';
+        link.click();
+    };
 
-function calculateKarma(node) {
-    let karmaScore = 0;
-    if (node.children) {
-        node.children.forEach(child => {
-            karmaScore += calculateKarma(child);
-        });
-    } else {
-        karmaScore += parseInt(Math.random() * 100); // Random karma score for leaf nodes
-    }
-    return karmaScore;
-}
-
-function updateKarmaScores() {
-    const totalKarma = calculateKarma(treeData);
-    document.getElementById("total-karma").textContent = `Total Karma: ${totalKarma}`;
-}
-
-// Add event listener for updating karma scores
-window.addEventListener('resize', updateKarmaScores);
-window.addEventListener('load', updateKarmaScores);
-
-updateKarmaScores();
-
-  
+    image.src = url;
+});

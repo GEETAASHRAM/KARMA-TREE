@@ -3,36 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karma Tree Visualization</title>
+    <title>Karma Tree Framework</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
 
-    <div class="interactive-elements">
-        <input type="text" id="filter-input" placeholder="Filter Nodes...">
-        <button onclick="filterTree()">Filter</button>
-        <input type="text" id="search-input" placeholder="Search...">
-        <button onclick="searchTree()">Search</button>
-        <button onclick="exportAsImage()">Export Image</button>
-    </div>
-    <div id="karma-tree-container"></div>
-    <p>Total Karma: <span id="total-karma">0</span></p>
-    <!-- Add this to your HTML -->
-<div id="info-container">
-    <h2>Karma Tree Framework Guide</h2>
-    <ul>
-        <li><strong>Cosmic Context Layer:</strong> Influences from galactic forces and celestial bodies.</li>
-        <li><strong>Environmental Layer:</strong> Effects of ecosystems, climate, and geography.</li>
-        <li><strong>Consciousness Layer:</strong> Individual and collective thought patterns.</li>
-        <li><strong>Subconscious Layer:</strong> Unconscious motivations and genetic influences.</li>
-        <li><strong>Physical Layer:</strong> Biological processes and material possessions.</li>
-        <li><strong>Social Layer:</strong> Relationships and societal structures.</li>
-        <li><strong>Spiritual Layer:</strong> Belief systems and mystical experiences.</li>
-        <li><strong>Temporal Layer:</strong> Historical events and future predictions.</li>
-    </ul>
-</div>
+    <div class="container">
+        <!-- Input Form -->
+        <div class="input-section">
+            <h1>Karma Tree Generator</h1>
+            <form id="karmaForm">
+                <label for="subject">Enter the Subject or Topic:</label>
+                <input type="text" id="subject" name="subject" placeholder="e.g., Life Decision, Business" required>
+                
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" required>
+                
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" required>
+                
+                <button type="submit">Generate Karma Tree</button>
+            </form>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+            <!-- Search Bar -->
+            <input type="text" id="search" placeholder="Search nodes...">
+
+            <!-- Filter Dropdown -->
+            <select id="filter">
+                <option value="all">Show All</option>
+                <option value="positive">Positive Karma</option>
+                <option value="negative">Negative Karma</option>
+            </select>
+
+            <!-- Export Button -->
+            <button id="exportButton">Export as Image</button>
+        </div>
+
+        <!-- Karma Tree Visualization Section -->
+        <div class="visualization-section">
+            <h2>Karma Tree</h2>
+            <svg id="karmaTreeSvg" width="800" height="500"></svg>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

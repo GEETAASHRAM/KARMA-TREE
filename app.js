@@ -118,7 +118,12 @@ document.getElementById('karmaForm').addEventListener('submit', function(event) 
 //     }
 // }
 
-function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDate) {
+function generateKarmaTree() {
+    const subject = document.getElementById('subject').value;
+    const eventType = document.getElementById('eventType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const otherInfluences = document.getElementById('otherInfluences').value;
 
     // Validate inputs
     if (!subject || !eventType || !startDate || !endDate) {
@@ -127,16 +132,27 @@ function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDa
     }
 
     // Sample data generation based on inputs
-    // In a real application, this data should be generated dynamically
     const data = generateSampleData(subject, eventType, startDate, endDate, otherInfluences);
 
     // Clear any existing SVG elements
     d3.select("#karmaTreeSvg").selectAll("*").remove();
 
+    // Define SVG container
     const svg = d3.select("#karmaTreeSvg");
     const width = +svg.attr("width");
     const height = +svg.attr("height");
 
+    // Define zoom behavior
+    const zoomHandler = d3.zoom()
+        .scaleExtent([0.5, 3])
+        .on("zoom", (event) => {
+            svg.selectAll("g")
+                .attr("transform", event.transform);
+        });
+
+    svg.call(zoomHandler);
+
+    // Define simulation
     const simulation = d3.forceSimulation(data.nodes)
         .force("link", d3.forceLink(data.links).id(d => d.id).distance(150))
         .force("charge", d3.forceManyBody().strength(-300))
@@ -144,6 +160,7 @@ function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDa
         .force("x", d3.forceX(d => d.time === 'before' ? width / 4 : d.time === 'after' ? 3 * width / 4 : width / 2))
         .force("y", d3.forceY(height / 2));
 
+    // Draw links
     const link = svg.append("g")
         .attr("class", "links")
         .selectAll("line")
@@ -152,6 +169,7 @@ function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDa
         .attr("stroke-width", 2)
         .attr("stroke", "#999");
 
+    // Draw nodes
     const node = svg.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
@@ -179,6 +197,7 @@ function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDa
             d3.select("#tooltip").style("opacity", 0);
         });
 
+    // Draw labels
     const label = svg.append("g")
         .attr("class", "labels")
         .selectAll("text")
@@ -188,6 +207,7 @@ function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDa
         .attr("text-anchor", "middle")
         .text(d => d.id);
 
+    // Update positions on simulation tick
     simulation.on("tick", () => {
         link
             .attr("x1", d => d.source.x)
@@ -204,6 +224,7 @@ function generateKarmaTree(subject, eventType, otherInfluences, startDate, endDa
             .attr("y", d => d.y);
     });
 
+    // Drag functions
     function dragstarted(event, d) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -245,6 +266,7 @@ function generateSampleData(subject, eventType, startDate, endDate, otherInfluen
         ]
     };
 }
+
 
 
 // Search functionality

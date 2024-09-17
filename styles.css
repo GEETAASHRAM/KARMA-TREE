@@ -40,3 +40,17 @@ body {
     fill: #333;
     opacity: 0.8;
 }
+
+/* Add this to your CSS */
+
+@media (max-width: 768px) {
+    #karma-tree-container {
+        height: auto;
+    }
+
+    /* Adjust node size for smaller screens */
+    .node circle {
+        r: 5px;
+    }
+}
+

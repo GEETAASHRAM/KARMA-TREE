@@ -118,20 +118,12 @@ svg.selectAll(".node")
 function filterTree(filterTerm) {
     const filteredData = treeData.filter(node => 
         node.name.toLowerCase().includes(filterTerm.toLowerCase()) ||
-        node.children.some(child => child.name.toLowerCase().includes(filterTerm.toLowerCase()))
+        node.children && node.children.some(child => child.name.toLowerCase().includes(filterTerm.toLowerCase()))
     );
 
     drawTree(filteredData);
 }
 
-document.getElementById("filter-input").addEventListener("input", function() {
-    const filterTerm = this.value.trim();
-    if (filterTerm.length > 0) {
-        filterTree(filterTerm);
-    } else {
-        drawTree(treeData);
-    }
-});
 
 // Add searching functionality
 function searchTree(searchTerm) {
@@ -160,6 +152,16 @@ function searchNodeChildren(children, searchTerm) {
     }, []);
 }
 
+// Add event listeners for filtering and searching
+document.getElementById("filter-input").addEventListener("input", function() {
+    const filterTerm = this.value.trim();
+    if (filterTerm.length > 0) {
+        filterTree(filterTerm);
+    } else {
+        drawTree(treeData);
+    }
+});
+
 document.getElementById("search-input").addEventListener("input", function() {
     const searchTerm = this.value.trim();
     if (searchTerm.length > 0) {
@@ -168,6 +170,8 @@ document.getElementById("search-input").addEventListener("input", function() {
         drawTree(treeData);
     }
 });
+
+
 
 function calculateKarma(node) {
     let karmaScore = 0;
@@ -201,6 +205,6 @@ function exportAsImage() {
     document.body.removeChild(downloadLink);
 }
 
-document.getElementById("export-button").addEventListener("click", exportAsImage);
 
+document.getElementById("export-button").addEventListener("click", exportAsImage);
   

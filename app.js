@@ -186,7 +186,7 @@ function exportAsImage() {
 }
 
 
-document.getElementById("export-button").addEventListener("click", exportAsImage);
+// document.getElementById("export-button").addEventListener("click", exportAsImage);
 
 function calculateKarma(node) {
     let karmaScore = 0;

@@ -116,12 +116,37 @@ function generateKarmaTree(subject, startDate, endDate) {
 }
 
 // Search functionality
+// Enhanced search functionality
 document.getElementById('search').addEventListener('input', function() {
     const searchTerm = this.value.toLowerCase();
-    d3.selectAll('circle').style('stroke', function(d) {
-        return d.id.toLowerCase().includes(searchTerm) ? '#ffeb3b' : null;
-    });
+    
+    // Highlight nodes based on search term
+    const matchingNodes = d3.selectAll('circle').filter(d => d.id.toLowerCase().includes(searchTerm));
+    
+    if (searchTerm === "") {
+        // Reset all nodes if search input is cleared
+        d3.selectAll('circle').style('stroke', null).style('stroke-width', null);
+        d3.selectAll('text').style('fill', null); // Reset node labels as well
+    } else {
+        // Reset all nodes
+        d3.selectAll('circle').style('stroke', null).style('stroke-width', null);
+        d3.selectAll('text').style('fill', null); // Reset node labels
+        
+        // Apply highlighting to matching nodes
+        matchingNodes.style('stroke', '#ffeb3b').style('stroke-width', 3);
+        matchingNodes.each(function(d) {
+            // Bring the node to focus by coloring its text label
+            d3.select(this).style('stroke-width', 3);
+            d3.select(this.nextSibling).style('fill', '#ffeb3b'); // Highlight label
+        });
+        
+        if (matchingNodes.empty()) {
+            console.log('No matches found.');
+            // You could also show a message in the UI if no nodes match
+        }
+    }
 });
+
 
 // Filter functionality
 document.getElementById('filter').addEventListener('change', function() {

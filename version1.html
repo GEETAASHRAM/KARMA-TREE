@@ -14,17 +14,31 @@
         <div class="input-section">
             <h1>Karma Tree Generator</h1>
             <form id="karmaForm">
-                <label for="subject">Enter the Subject or Topic:</label>
-                <input type="text" id="subject" name="subject" placeholder="e.g., Life Decision, Business" required>
-                
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" name="startDate" required>
-                
-                <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" name="endDate" required>
-                
-                <button type="submit">Generate Karma Tree</button>
-            </form>
+    <label for="subject">Enter the Subject/Topic:</label>
+    <input type="text" id="subject" name="subject" required>
+    
+    <label for="eventType">Select Event Type:</label>
+    <select id="eventType" name="eventType">
+        <option value="individualAction">Individual Actions & Thoughts</option>
+        <option value="peopleRelationships">People & Relationships</option>
+        <option value="processesEvents">Processes/Events</option>
+        <option value="celestialBodies">Celestial Bodies</option>
+        <option value="environmentalFactors">Environmental Factors</option>
+        <option value="spaceTimeEvents">Space-Time Events</option>
+    </select>
+
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" required>
+
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate" required>
+
+    <label for="otherInfluences">Other Influences (optional):</label>
+    <textarea id="otherInfluences" name="otherInfluences" placeholder="People, locations, historical moments, etc."></textarea>
+
+    <button type="button" onclick="generateKarmaTree()">Generate Karma Tree</button>
+</form>
+
 
             <div class="instructions">
                 <h3>How to Use the Karma Tree Framework:</h3>
